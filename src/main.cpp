@@ -1,7 +1,11 @@
 #include <TMC5240.h>
+#include <SPIHelper.h>
 
 // Pin-Definitionen
 #define CS_PIN    15
+#define MOSI_PIN  12
+#define MISO_PIN  21
+#define SCK_PIN   13
 #define EN_PIN    54
 
 // Referenz­widerstand an IREF (Ohm)
@@ -18,7 +22,8 @@ constexpr uint16_t stepsPerRev  = 200;  // Vollschritte/Umdrehung
 const int32_t    halfRotation  = (int32_t)stepsPerRev * microsteps / 2;
 const int32_t    fullRotation  = halfRotation * 2;
 
-TMC5240 driver(CS_PIN, R_REF);
+SPIHelper spi(SPI3_HOST, MOSI_PIN, MISO_PIN, SCK_PIN, CS_PIN);
+TMC5240 driver(spi, R_REF);
 
 // Statusanzeige
 void printDriverStatus() {
@@ -37,7 +42,7 @@ void setup() {
   pinMode(EN_PIN, OUTPUT);
   digitalWrite(EN_PIN, LOW);       // Treiber einschalten
 
-  SPI.begin();
+  spi.begin();
   Serial.begin(115200);
   while(!Serial);
 

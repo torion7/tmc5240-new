@@ -2,7 +2,7 @@
 #define TMC5240_H
 
 #include <Arduino.h>
-#include <SPI.h>
+#include <SPIHelper.h>
 
 struct DRV_STATUS_t {
   uint32_t sr;
@@ -26,7 +26,7 @@ struct DRV_STATUS_t {
 class TMC5240 {
 public:
     static constexpr float default_RREF = 12000.0f; // Ohms
-    TMC5240(uint8_t csPin, float Rref = default_RREF, SPIClass &spi = SPI);
+    TMC5240(SPIHelper &spi, float Rref = default_RREF);
     void begin();
 
     void filt_isense(uint8_t val);
@@ -62,9 +62,8 @@ public:
     uint16_t cs2rms(uint8_t CS);
 
 private:
-    uint8_t _cs;
     float _Rref;
-    SPIClass *_spi;
+    SPIHelper *_spi;
 
     uint32_t CHOPCONF_reg = 0x10410150UL;
     uint32_t PWMCONF_reg  = 0xC40C001EUL;
