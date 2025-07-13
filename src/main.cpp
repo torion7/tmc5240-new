@@ -1,10 +1,7 @@
-#include <TMCStepper.h>
+#include <TMC5240.h>
 
 // Pin-Definitionen
 #define CS_PIN    15
-#define MOSI_PIN  12
-#define MISO_PIN  21
-#define SCK_PIN   13
 #define EN_PIN    54
 
 // Referenz­widerstand an IREF (Ohm)
@@ -21,11 +18,11 @@ constexpr uint16_t stepsPerRev  = 200;  // Vollschritte/Umdrehung
 const int32_t    halfRotation  = (int32_t)stepsPerRev * microsteps / 2;
 const int32_t    fullRotation  = halfRotation * 2;
 
-TMC5240Stepper driver(CS_PIN, R_REF, MOSI_PIN, MISO_PIN, SCK_PIN);
+TMC5240 driver(CS_PIN, R_REF);
 
 // Statusanzeige
 void printDriverStatus() {
-  TMC2130_n::DRV_STATUS_t s{0};
+  DRV_STATUS_t s{0};
   s.sr = driver.DRV_STATUS();
   Serial.print("SG_RESULT="); Serial.print(s.sg_result);
   Serial.print(" CS_ACTUAL="); Serial.print(s.cs_actual);
