@@ -28,37 +28,17 @@ static constexpr uint8_t REG_XTARGET    = 0x2D;
 static constexpr uint8_t REG_SW_MODE    = 0x34;
 static constexpr uint8_t REG_RAMP_STAT  = 0x35;
 
-TMC5240::TMC5240(uint8_t csPin, float Rref, SPIClass &spi) : _cs(csPin), _Rref(Rref), _spi(&spi) {}
+TMC5240::TMC5240(SPIHelper &spi, float Rref) : _Rref(Rref), _spi(&spi) {}
 
 void TMC5240::writeReg(uint8_t addr, uint32_t val) {
-    digitalWrite(_cs, LOW);
-    _spi->transfer(addr | TMC_WRITE);
-    _spi->transfer(val >> 24);
-    _spi->transfer(val >> 16);
-    _spi->transfer(val >> 8);
-    _spi->transfer(val);
-    digitalWrite(_cs, HIGH);
+    _spi->write(addr, val);
 }
 
 uint32_t TMC5240::readReg(uint8_t addr) {
-    digitalWrite(_cs, LOW);
-    _spi->transfer(addr & 0x7F);
-    _spi->transfer(0); _spi->transfer(0); _spi->transfer(0); _spi->transfer(0);
-    digitalWrite(_cs, HIGH);
-    digitalWrite(_cs, LOW);
-    _spi->transfer(addr & 0x7F);
-    uint32_t val = 0;
-    val = _spi->transfer(0); val <<= 8;
-    val |= _spi->transfer(0); val <<= 8;
-    val |= _spi->transfer(0); val <<= 8;
-    val |= _spi->transfer(0);
-    digitalWrite(_cs, HIGH);
-    return val;
+    return _spi->read(addr);
 }
 
 void TMC5240::begin() {
-    pinMode(_cs, OUTPUT);
-    digitalWrite(_cs, HIGH);
     _spi->begin();
     // load defaults to driver
     writeReg(REG_CHOPCONF, CHOPCONF_reg);
